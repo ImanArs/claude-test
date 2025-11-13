@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Parking Jam 3D</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, #87CEEB 0%, #E0E0E0 100%);
+      touch-action: none;
+    }
+
+    #game-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    #ui-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #top-panel {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      pointer-events: auto;
+    }
+
+    #level-indicator {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 12px 24px;
+      border-radius: 25px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #333;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .ui-button {
+      background: rgba(255, 255, 255, 0.95);
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+      pointer-events: auto;
+    }
+
+    .ui-button:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    #victory-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      pointer-events: auto;
+    }
+
+    #victory-overlay.show {
+      display: flex;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #victory-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.8); }
+      to { transform: scale(1); }
+    }
+
+    #victory-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: #4CAF50;
+      margin-bottom: 20px;
+    }
+
+    #victory-message {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    #next-level-button {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #next-level-button:active {
+      transform: scale(0.95);
+      box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
+    }
+
+    #confetti-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game-canvas"></canvas>
+
+  <div id="ui-container">
+    <div id="top-panel">
+      <button id="home-button" class="ui-button" title="Home">🏠</button>
+      <div id="level-indicator">LEVEL 1</div>
+      <button id="restart-button" class="ui-button" title="Restart">🔄</button>
+    </div>
+
+    <div id="victory-overlay">
+      <canvas id="confetti-canvas"></canvas>
+      <div id="victory-content">
+        <div id="victory-title">🎉 Level Complete! 🎉</div>
+        <div id="victory-message">You cleared the jam!</div>
+        <button id="next-level-button">Next Level</button>
+      </div>
+    </div>
+
+    <div id="loading">Loading...</div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
