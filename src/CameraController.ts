@@ -7,10 +7,12 @@ export class CameraController {
   private swayEnabled: boolean = true;
 
   constructor(aspect: number) {
-    this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
+    // Wider FOV for better view of the parking lot
+    this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 100);
 
-    // Isometric-style camera position
-    this.basePosition = new THREE.Vector3(6, 8, 6);
+    // Better isometric-style camera position - more top-down view
+    // Position is higher and more centered for clear view of all cars
+    this.basePosition = new THREE.Vector3(4, 10, 8);
     this.camera.position.copy(this.basePosition);
     this.camera.lookAt(0, 0, 0);
   }
@@ -44,11 +46,13 @@ export class CameraController {
   }
 
   public adjustForGridSize(gridWidth: number, gridHeight: number): void {
-    // Adjust camera distance based on grid size
+    // Adjust camera distance based on grid size for optimal view
     const maxSize = Math.max(gridWidth, gridHeight);
-    const distance = maxSize * 1.5 + 3;
+    const distance = maxSize * 1.3 + 4;
 
-    this.basePosition.set(distance * 0.7, distance * 0.9, distance * 0.7);
+    // Position: slightly to the side (x), high up (y), and back (z)
+    // This gives a clear isometric view of the entire parking lot
+    this.basePosition.set(distance * 0.5, distance * 1.1, distance * 0.9);
     this.camera.position.copy(this.basePosition);
     this.camera.lookAt(0, 0, 0);
   }

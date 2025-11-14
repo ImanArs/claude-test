@@ -170,13 +170,368 @@
       font-weight: bold;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
+
+    /* Main Menu Styles */
+    #main-menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+      z-index: 100;
+    }
+
+    #main-menu.hidden {
+      display: none;
+    }
+
+    .game-logo {
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      margin-bottom: 60px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .menu-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 280px;
+    }
+
+    .menu-button {
+      background: white;
+      border: none;
+      padding: 18px 40px;
+      border-radius: 50px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #667eea;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .menu-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .menu-button:active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-button.primary {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      font-size: 24px;
+    }
+
+    /* Settings Screen */
+    #settings-screen, #shop-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      pointer-events: auto;
+      z-index: 100;
+      overflow-y: auto;
+    }
+
+    #settings-screen.show, #shop-screen.show {
+      display: flex;
+    }
+
+    .screen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 40px;
+    }
+
+    .screen-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: white;
+      flex: 1;
+      text-align: center;
+    }
+
+    .back-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      transition: all 0.2s;
+    }
+
+    .back-button:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .settings-content, .shop-content {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .setting-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .setting-label {
+      font-size: 18px;
+      color: white;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 60px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .toggle-switch.active {
+      background: #4CAF50;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(30px);
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex: 1;
+      max-width: 200px;
+    }
+
+    .slider {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.3);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    .slider-value {
+      color: white;
+      font-weight: bold;
+      min-width: 40px;
+    }
+
+    /* Shop Styles */
+    .shop-section {
+      margin-bottom: 30px;
+    }
+
+    .shop-section-title {
+      font-size: 20px;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .color-item {
+      aspect-ratio: 1;
+      border-radius: 15px;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .color-item:active {
+      transform: scale(0.95);
+    }
+
+    .color-item.selected {
+      border-color: white;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+
+    .game-info {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      color: white;
+      text-align: center;
+    }
+
+    .game-info p {
+      margin: 5px 0;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
   <canvas id="game-canvas"></canvas>
 
   <div id="ui-container">
-    <div id="top-panel">
+    <!-- Main Menu -->
+    <div id="main-menu">
+      <div class="game-logo">🚗 PARKING JAM 3D</div>
+      <div class="menu-buttons">
+        <button id="play-button" class="menu-button primary">
+          <span>▶️</span> PLAY
+        </button>
+        <button id="shop-button" class="menu-button">
+          <span>🛒</span> SHOP
+        </button>
+        <button id="settings-button" class="menu-button">
+          <span>⚙️</span> SETTINGS
+        </button>
+      </div>
+      <div class="game-info">
+        <p>Move cars to free the red car!</p>
+        <p>5 Challenging Levels</p>
+      </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings-screen">
+      <div class="screen-header">
+        <button class="back-button" id="settings-back">←</button>
+        <div class="screen-title">⚙️ SETTINGS</div>
+        <div style="width: 45px;"></div>
+      </div>
+      <div class="settings-content">
+        <div class="setting-item">
+          <div class="setting-label">🔊 Sound Effects</div>
+          <div class="toggle-switch active" id="sound-toggle"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">🎵 Volume</div>
+          <div class="slider-container">
+            <input type="range" min="0" max="100" value="30" class="slider" id="volume-slider">
+            <span class="slider-value" id="volume-value">30%</span>
+          </div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">✨ Shadows</div>
+          <div class="toggle-switch active" id="shadows-toggle"></div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-label">📱 Haptic Feedback</div>
+          <div class="toggle-switch" id="haptic-toggle"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shop-screen">
+      <div class="screen-header">
+        <button class="back-button" id="shop-back">←</button>
+        <div class="screen-title">🛒 SHOP</div>
+        <div style="width: 45px;"></div>
+      </div>
+      <div class="shop-content">
+        <div class="shop-section">
+          <div class="shop-section-title">Main Car Color</div>
+          <div class="color-grid">
+            <div class="color-item selected" data-color="#ff3333" style="background: #ff3333;">✓</div>
+            <div class="color-item" data-color="#ff6b35" style="background: #ff6b35;"></div>
+            <div class="color-item" data-color="#f72585" style="background: #f72585;"></div>
+            <div class="color-item" data-color="#7209b7" style="background: #7209b7;"></div>
+            <div class="color-item" data-color="#3a0ca3" style="background: #3a0ca3;"></div>
+            <div class="color-item" data-color="#06d6a0" style="background: #06d6a0;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game UI -->
+    <div id="top-panel" style="display: none;">
       <button id="home-button" class="ui-button" title="Home">🏠</button>
       <div id="level-indicator">LEVEL 1</div>
       <button id="restart-button" class="ui-button" title="Restart">🔄</button>

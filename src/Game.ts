@@ -5,6 +5,7 @@ import { CameraController } from './CameraController';
 import { UIManager } from './UI';
 import { AudioManager } from './AudioManager';
 import { LEVELS, LevelConfig } from './LevelData';
+import { GameStateManager, GameState, GameSettings } from './GameStateManager';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -15,6 +16,7 @@ export class Game {
   private cars: Car[] = [];
   private ui: UIManager;
   private audio: AudioManager;
+  private stateManager: GameStateManager;
 
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
@@ -27,6 +29,7 @@ export class Game {
   private mainCar: Car | null = null;
   private exitPosition: { x: number; z: number } = { x: 5, z: 2 };
   private isVictory: boolean = false;
+  private isInitialized: boolean = false;
 
   private clock: THREE.Clock;
   private lastTime: number = 0;
@@ -34,6 +37,9 @@ export class Game {
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.clock = new THREE.Clock();
+
+    // Initialize state manager
+    this.stateManager = new GameStateManager();
 
     // Initialize renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -43,7 +49,7 @@ export class Game {
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.enabled = this.stateManager.getSettings().shadowsEnabled;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.2;
@@ -60,12 +66,11 @@ export class Game {
 
     // Initialize UI
     this.ui = new UIManager();
-    this.ui.onRestart = () => this.restartLevel();
-    this.ui.onHome = () => this.goToLevel(0);
-    this.ui.onNextLevel = () => this.nextLevel();
+    this.setupUICallbacks();
 
     // Initialize audio
     this.audio = new AudioManager();
+    this.applySettings(this.stateManager.getSettings());
 
     // Input handling
     this.raycaster = new THREE.Raycaster();
@@ -76,9 +81,100 @@ export class Game {
 
     this.setupEventListeners();
     this.setupLighting();
-    this.loadLevel(this.currentLevel);
+
+    // Setup state change handling
+    this.stateManager.setOnStateChange((newState, oldState) => {
+      this.onStateChange(newState, oldState);
+    });
 
     this.ui.hideLoading();
+    this.ui.showMainMenu();
+  }
+
+  private setupUICallbacks(): void {
+    // Game UI callbacks
+    this.ui.onRestart = () => this.restartLevel();
+
+    this.ui.onHome = () => {
+      this.stateManager.setState(GameState.MAIN_MENU);
+    };
+
+    this.ui.onNextLevel = () => this.nextLevel();
+
+    // Menu callbacks
+    this.ui.onPlay = () => {
+      this.stateManager.setState(GameState.PLAYING);
+      if (!this.isInitialized) {
+        this.loadLevel(0);
+        this.isInitialized = true;
+      }
+    };
+
+    // Settings callback
+    this.ui.onSettingsChange = (settings: Partial<GameSettings>) => {
+      Object.keys(settings).forEach(key => {
+        this.stateManager.updateSetting(key as keyof GameSettings, settings[key as keyof GameSettings]!);
+      });
+      this.applySettings(this.stateManager.getSettings());
+    };
+
+    // Shop callback
+    this.ui.onColorChange = (color: string) => {
+      this.stateManager.updateSetting('mainCarColor', color);
+      if (this.mainCar) {
+        this.updateMainCarColor(color);
+      }
+    };
+
+    // Apply initial settings
+    this.ui.applySettings(this.stateManager.getSettings());
+  }
+
+  private onStateChange(newState: GameState, oldState: GameState): void {
+    switch (newState) {
+      case GameState.MAIN_MENU:
+        this.ui.showMainMenu();
+        this.ui.hideVictory();
+        break;
+
+      case GameState.PLAYING:
+        this.ui.showGameUI();
+        this.ui.hideVictory();
+        break;
+
+      case GameState.SETTINGS:
+        // UI handles settings screen
+        break;
+
+      case GameState.SHOP:
+        // UI handles shop screen
+        break;
+    }
+  }
+
+  private applySettings(settings: GameSettings): void {
+    // Apply audio settings
+    this.audio.setEnabled(settings.soundEnabled);
+    this.audio.setVolume(settings.volume / 100);
+
+    // Apply shadow settings
+    this.renderer.shadowMap.enabled = settings.shadowsEnabled;
+  }
+
+  private updateMainCarColor(color: string): void {
+    if (!this.mainCar) return;
+
+    // Update car color
+    this.mainCar.mesh.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.material instanceof THREE.MeshStandardMaterial) {
+          // Skip windows (darker material)
+          if (child.material.color.getHex() !== 0x2a2a2a) {
+            child.material.color.setStyle(color);
+          }
+        }
+      }
+    });
   }
 
   private setupLighting(): void {
@@ -207,11 +303,11 @@ export class Game {
     const thickness = 0.2;
     const boundaryHeight = 0.3;
 
-    // Create boundary walls (except exit side)
+    // Create boundary walls
     const boundaries = [
       // Left
       { w: thickness, h: height + thickness * 2, x: -width / 2 - thickness / 2, z: 0 },
-      // Right (with gap for exit)
+      // Right
       { w: thickness, h: height + thickness * 2, x: width / 2 + thickness / 2, z: 0 },
       // Front
       { w: width, h: thickness, x: 0, z: -height / 2 - thickness / 2 },
@@ -256,9 +352,17 @@ export class Game {
     // Adjust camera for grid size
     this.cameraController.adjustForGridSize(levelConfig.gridWidth, levelConfig.gridHeight);
 
+    // Get main car color from settings
+    const mainCarColor = this.stateManager.getSettings().mainCarColor;
+
     // Create cars
     levelConfig.cars.forEach(carData => {
-      const car = new Car(carData, this.grid);
+      // Override main car color with user's selection
+      const modifiedData = carData.isMain
+        ? { ...carData, color: mainCarColor }
+        : carData;
+
+      const car = new Car(modifiedData, this.grid);
       this.cars.push(car);
       this.scene.add(car.mesh);
 
@@ -277,10 +381,6 @@ export class Game {
 
   private nextLevel(): void {
     this.loadLevel(this.currentLevel + 1);
-  }
-
-  private goToLevel(levelIndex: number): void {
-    this.loadLevel(levelIndex);
   }
 
   private setupEventListeners(): void {
@@ -312,7 +412,7 @@ export class Game {
   }
 
   private onPointerDown(clientX: number, clientY: number): void {
-    if (this.isVictory) return;
+    if (this.isVictory || !this.stateManager.isPlaying()) return;
 
     this.updateMousePosition(clientX, clientY);
     this.raycaster.setFromCamera(this.mouse, this.cameraController.camera);
@@ -332,6 +432,11 @@ export class Game {
 
         this.audio.playSelect();
 
+        // Haptic feedback
+        if (this.stateManager.getSettings().hapticEnabled && 'vibrate' in navigator) {
+          navigator.vibrate(10);
+        }
+
         // Calculate drag offset
         this.raycaster.ray.intersectPlane(this.dragPlane, this.dragStartPos);
         this.dragOffset.copy(this.selectedCar.mesh.position).sub(this.dragStartPos);
@@ -342,7 +447,7 @@ export class Game {
   }
 
   private onPointerMove(clientX: number, clientY: number): void {
-    if (!this.selectedCar || this.isVictory) return;
+    if (!this.selectedCar || this.isVictory || !this.stateManager.isPlaying()) return;
 
     this.updateMousePosition(clientX, clientY);
     this.raycaster.setFromCamera(this.mouse, this.cameraController.camera);
@@ -368,7 +473,7 @@ export class Game {
   }
 
   private onPointerUp(): void {
-    if (!this.selectedCar || this.isVictory) return;
+    if (!this.selectedCar || this.isVictory || !this.stateManager.isPlaying()) return;
 
     const currentWorldPos = this.selectedCar.mesh.position;
     const gridPos = this.grid.worldToGrid(currentWorldPos);
@@ -377,9 +482,20 @@ export class Game {
 
     if (moved) {
       this.audio.playSlide();
+
+      // Haptic feedback on successful move
+      if (this.stateManager.getSettings().hapticEnabled && 'vibrate' in navigator) {
+        navigator.vibrate(20);
+      }
+
       this.checkWinCondition();
     } else {
       this.audio.playBlocked();
+
+      // Haptic feedback on blocked move
+      if (this.stateManager.getSettings().hapticEnabled && 'vibrate' in navigator) {
+        navigator.vibrate([10, 50, 10]);
+      }
     }
 
     this.selectedCar.setSelected(false);
@@ -408,6 +524,11 @@ export class Game {
   private triggerVictory(): void {
     this.isVictory = true;
     this.audio.playVictory();
+
+    // Haptic feedback on victory
+    if (this.stateManager.getSettings().hapticEnabled && 'vibrate' in navigator) {
+      navigator.vibrate([100, 50, 100, 50, 200]);
+    }
 
     // Animate cars driving away
     this.cars.forEach(car => {
