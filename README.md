@@ -48,42 +48,60 @@ npm run preview
 
 ## ✨ Features
 
+### Complete Game Experience
+- 🏠 **Main Menu** - Professional animated menu with logo and navigation
+- ⚙️ **Settings Screen** - Customize audio, shadows, and haptic feedback
+- 🛒 **Shop** - Choose from 6 colors for your main car
+- 💾 **Save System** - Settings persist across sessions with localStorage
+- 🎮 **Full Game Flow** - Professional navigation between all screens
+
 ### Gameplay
 - 🎯 **5 Progressive Levels** - Increasing challenge with more cars and complex puzzles
 - 🚘 **Smooth Car Movement** - Drag-and-drop controls with smooth lerp animations
 - 🏁 **Victory System** - Confetti celebration and level progression
-- 🔄 **Restart & Navigation** - Easy level restart and home navigation
+- 🔄 **Restart & Navigation** - Easy level restart and return to main menu
+- 📱 **Haptic Feedback** - Vibration feedback for mobile devices (optional)
 
 ### Graphics & Visuals
 - 🎨 **Modern 3D Graphics** - Built with Three.js WebGL renderer
-- 🌅 **Isometric Camera** - Beautiful angled view like Crossy Road
+- 📐 **Optimized Isometric Camera** - Perfect top-down view of the entire parking lot
 - 💡 **Dynamic Lighting** - Ambient, hemisphere, and directional lights with shadows
-- 🎭 **Shadow Mapping** - Realistic soft shadows for depth
+- 🎭 **Shadow Mapping** - Realistic soft shadows for depth (can be toggled)
 - ✨ **Visual Effects** - Hover highlights, exit gate indicators, confetti particles
-- 🌈 **Colorful Cars** - Red, blue, orange, yellow, purple, green vehicles
+- 🌈 **Customizable Cars** - Choose from 6 vibrant colors for your main car
+- 🎪 **Smooth Animations** - Bouncing logo, screen transitions, victory effects
+
+### Settings & Customization
+- 🔊 **Audio Controls** - Toggle sound effects on/off
+- 🎚️ **Volume Slider** - Adjust sound volume (0-100%)
+- 💡 **Graphics Options** - Enable/disable shadows for performance
+- 📳 **Haptic Feedback** - Optional vibration on mobile devices
+- 🎨 **Car Colors** - Red, orange, pink, purple, blue, green options
 
 ### Technical
 - 📱 **Mobile Optimized** - Touch controls with responsive design (portrait 9:16)
 - 🎯 **Grid-Based Logic** - Collision detection and movement validation
-- 🎵 **Audio Feedback** - Synthesized sound effects for actions
+- 🎵 **Audio Feedback** - Synthesized sound effects with volume control
 - ⚡ **60 FPS Performance** - Optimized rendering and animations
 - 🏗️ **Modular Architecture** - Clean separation of concerns
+- 🔄 **State Management** - Robust game state system with persistence
 
 ## 📁 Project Structure
 
 ```
 parking-jam-3d/
 ├── src/
-│   ├── Game.ts              # Main game orchestrator
+│   ├── Game.ts              # Main game orchestrator with state integration
+│   ├── GameStateManager.ts  # State management and settings persistence
 │   ├── Grid.ts              # Grid system and spatial logic
 │   ├── Car.ts               # Car entity with 3D model
-│   ├── CameraController.ts  # Camera management and movement
+│   ├── CameraController.ts  # Optimized camera with isometric view
 │   ├── LevelData.ts         # Level configurations (5 levels)
-│   ├── UI.ts                # UI management and confetti system
+│   ├── UI.ts                # UI management for all screens
 │   ├── AudioManager.ts      # Sound effects synthesis
 │   ├── main.ts              # Entry point
 │   └── style.css            # Additional styles
-├── index.html               # Main HTML with embedded styles
+├── index.html               # Main HTML with menu, settings, shop, game UI
 ├── package.json             # Dependencies and scripts
 ├── tsconfig.json            # TypeScript configuration
 └── vite.config.ts           # Vite build configuration
@@ -106,8 +124,17 @@ parking-jam-3d/
 - Highlight plane for selection feedback
 - Drive-away animations for victory
 
+### State Management (`GameStateManager.ts`)
+- Centralized game state control (Menu, Playing, Settings, Shop)
+- Settings persistence with localStorage
+- Audio, graphics, and haptic settings management
+- Main car color customization storage
+- State change notifications for UI updates
+
 ### Camera (`CameraController.ts`)
-- Isometric perspective camera
+- Optimized isometric perspective (45° FOV)
+- Perfect top-down view with clear sight of all cars
+- Improved positioning (higher elevation, better angle)
 - Subtle idle sway animation (0.3° oscillation)
 - Auto-adjusts for different grid sizes
 - Dynamic aspect ratio handling
@@ -122,10 +149,13 @@ parking-jam-3d/
   - Target (main) car
 
 ### UI (`UI.ts`)
-- Clean, modern interface with rounded buttons
-- Level indicator panel
-- Victory overlay with confetti particles
-- Restart and home navigation
+- **Main Menu** - Animated logo with gradient background
+- **Settings Screen** - Toggle switches and sliders for preferences
+- **Shop Screen** - Color picker grid for car customization
+- **Game UI** - Level indicator, restart/home buttons
+- **Victory Overlay** - Confetti particles and next level button
+- Screen transition management
+- Real-time settings application
 - Responsive design for all screen sizes
 
 ### Audio (`AudioManager.ts`)
@@ -135,6 +165,41 @@ parking-jam-3d/
   - Car movement
   - Blocked movement
   - Victory jingle (4-note melody)
+
+## 🎮 Complete Game Flow
+
+### Main Menu
+1. **Launch Game** - See animated main menu with bouncing logo
+2. **Three Options:**
+   - **▶️ PLAY** - Start/resume gameplay
+   - **🛒 SHOP** - Customize your main car color
+   - **⚙️ SETTINGS** - Adjust audio, graphics, and haptic options
+
+### Settings
+- Toggle sound effects on/off
+- Adjust volume with slider (0-100%)
+- Enable/disable realistic shadows
+- Toggle haptic feedback for mobile
+- Settings save automatically in localStorage
+
+### Shop
+- Choose from 6 vibrant colors for your main car
+- Color applies immediately in gameplay
+- Selection persists across sessions
+- Colors: Red (default), Orange, Pink, Purple, Blue, Green
+
+### Gameplay
+- Clean game UI with level indicator at top
+- Home button (🏠) returns to main menu
+- Restart button (🔄) resets current level
+- Drag cars to solve parking puzzles
+- Complete all 5 levels with increasing difficulty
+
+### Victory Flow
+- Cars drive away animation
+- Confetti celebration
+- "Next Level" button to continue
+- After Level 5: "Play Again" to restart from Level 1
 
 ## 🎯 Game Mechanics
 
@@ -147,13 +212,14 @@ parking-jam-3d/
 6. Grid occupancy updates in real-time
 
 ### Win Condition
-- Main car (red) must reach the designated exit cell
+- Main car (customizable color) must reach the designated exit cell
 - Exit marked with yellow ground plane and directional arrow
 - On win:
   1. All cars animate driving away in random directions
   2. Victory sound plays (C5 → E5 → G5 → C6 progression)
-  3. Confetti particles spawn and fall
-  4. Victory overlay appears with "Next Level" button
+  3. Haptic feedback vibrates (if enabled)
+  4. Confetti particles spawn and fall
+  5. Victory overlay appears with "Next Level" button
 
 ### Level Progression
 - 5 levels with progressively more cars (4 → 9 cars)
